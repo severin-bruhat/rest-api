@@ -1,4 +1,4 @@
 rest_api
 ========
 
-A Symfony project created on March 20, 2017, 3:14 am.
+This project is an implementation of a REST API with Symfony 3
