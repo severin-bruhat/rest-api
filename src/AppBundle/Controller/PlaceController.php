@@ -45,7 +45,7 @@ class PlaceController extends Controller
         /* @var $place Place */
 
         if (empty($place)) {
-            return new JsonResponse(['message' => 'Place not found'], Response::HTTP_NOT_FOUND);
+            return \FOS\RestBundle\View\View::create(['message' => 'Place not found'], Response::HTTP_NOT_FOUND);
         }
 
         return $place;
@@ -91,6 +91,62 @@ class PlaceController extends Controller
         if ($place) {
             $em->remove($place);
             $em->flush();
+        }
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Put("/places/{id}")
+     * @param Request $request
+     * @return Place
+     */
+    public function updatePlaceAction(Request $request)
+    {
+        return $this->updatePlace($request, true);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/places/{id}")
+     * @param Request $request
+     * @return Place
+     */
+    public function patchPlaceAction(Request $request)
+    {
+        return $this->updatePlace($request, false);
+    }
+
+    /**
+     * method to update or partialy update a place
+     * @param  Request $request      [description]
+     * @param  [type]  $clearMissing [description]
+     * @return [type]                [description]
+     */
+    private function updatePlace(Request $request, $clearMissing)
+    {
+        $place = $this->get('doctrine.orm.entity_manager')
+                ->getRepository('AppBundle:Place')
+                ->find($request->get('id')); // L'identifiant en tant que paramètre n'est plus nécessaire
+        /* @var $place Place */
+
+        if (empty($place)) {
+            return \FOS\RestBundle\View\View::create(['message' => 'Place not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm(PlaceType::class, $place);
+
+        // Le paramètre false dit à Symfony de garder les valeurs dans notre
+        // entité si l'utilisateur n'en fournit pas une dans sa requête
+        $form->submit($request->request->all(), $clearMissing);
+
+        if ($form->isValid()) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($place);
+            $em->flush();
+
+            return $place;
+        } else {
+            return $form;
         }
     }
 }
