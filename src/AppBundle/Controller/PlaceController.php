@@ -75,4 +75,22 @@ class PlaceController extends Controller
             return $form;
         }
     }
+
+    /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("/places/{id}")
+     * @param Request $request
+     */
+    public function removePlaceAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $place = $em->getRepository('AppBundle:Place')
+                    ->find($request->get('id'));
+        /* @var $place Place */
+
+        if ($place) {
+            $em->remove($place);
+            $em->flush();
+        }
+    }
 }
