@@ -86,3 +86,7 @@ fos_rest:
             'Symfony\Component\Security\Core\Exception\BadCredentialsException': true
         codes:
             'Symfony\Component\Security\Core\Exception\BadCredentialsException': 401
+    body_listener:
+        enabled: true
+    param_fetcher_listener:
+        enabled: true
