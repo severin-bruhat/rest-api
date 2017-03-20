@@ -2,6 +2,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
 * @ORM\Entity()
@@ -38,6 +39,11 @@ class User
      * @var Preference[]
      */
     protected $preferences;
+
+    /**
+     * used for suggestions
+     */
+    const MATCH_VALUE_THRESHOLD = 25;
 
     /**
      * [__construct description]
@@ -135,5 +141,24 @@ class User
     public function setPreferences($preferences)
     {
         $this->preferences = $preferences;
+    }
+
+    /**
+     * [preferencesMatch description]
+     * @param  [type] $themes [description]
+     * @return [type]         [description]
+     */
+    public function preferencesMatch($themes)
+    {
+        $matchValue = 0;
+        foreach ($this->preferences as $preference) {
+            foreach ($themes as $theme) {
+                if ($preference->match($theme)) {
+                    $matchValue += $preference->getValue() * $theme->getValue();
+                }
+            }
+        }
+
+        return $matchValue >= self::MATCH_VALUE_THRESHOLD;
     }
 }

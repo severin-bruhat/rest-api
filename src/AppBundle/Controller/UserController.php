@@ -15,7 +15,7 @@ use AppBundle\Entity\User;
 class UserController extends Controller
 {
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/users")
      * @param Request $request
      * @return JsonResponse
@@ -31,7 +31,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/users/{id}")
      * @param int     $id
      * @param Request $request
@@ -52,7 +52,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
      * @Rest\Post("/users")
      * @param Request $request
      * @return User
@@ -76,7 +76,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"user"})
      * @Rest\Delete("/users/{id}")
      * @param Request $request
      */
@@ -94,7 +94,7 @@ class UserController extends Controller
     }
 
     /**
-    * @Rest\View()
+    * @Rest\View(serializerGroups={"user"})
     * @Rest\Put("/users/{id}")
     * @param Request $request
     * @return User
@@ -105,7 +105,7 @@ class UserController extends Controller
     }
 
     /**
-    * @Rest\View()
+    * @Rest\View(serializerGroups={"user"})
     * @Rest\Patch("/users/{id}")
     * @param Request $request
     * @return User
@@ -153,5 +153,37 @@ class UserController extends Controller
     private function userNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * @Rest\View(serializerGroups={"place"})
+     * @Rest\Get("/users/{id}/suggestions")
+     * @param Request $request
+     * @return Collection of Syggestion objects
+     */
+    private function getUserSuggestionsAction(Request $request)
+    {
+        $user = $this->get('doctrine.orm.entity_manager')
+                ->getRepository('AppBundle:User')
+                ->find($request->get('id'));
+        /* @var $user User */
+
+        if (empty($user)) {
+            return $this->userNotFound();
+        }
+
+        $suggestions = [];
+
+        $places = $this->get('doctrine.orm.entity_manager')
+                ->getRepository('AppBundle:Place')
+                ->findAll();
+
+        foreach ($places as $place) {
+            if ($user->preferencesMatch($place->getThemes())) {
+                $suggestions[] = $place;
+            }
+        }
+
+        return $suggestions;
     }
 }
