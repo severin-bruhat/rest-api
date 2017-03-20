@@ -6,8 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
+use AppBundle\Form\Type\PlaceType;
 use AppBundle\Entity\Place;
 
 /**
@@ -36,7 +35,7 @@ class PlaceController extends Controller
      * @Rest\Get("/places/{id}")
      * @param int     $id
      * @param Request $request
-     * @return JsonResponse
+     * @return View
      */
     public function getPlaceAction($id, Request $request)
     {
@@ -50,5 +49,30 @@ class PlaceController extends Controller
         }
 
         return $place;
+    }
+
+    /**
+     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\Post("/places")
+     * @param Request $request
+     * @return Place
+     */
+    public function postPlacesAction(Request $request)
+    {
+        $place = new Place();
+
+        $form = $this->createForm(PlaceType::class, $place);
+
+        $form->submit($request->request->all());
+
+        if ($form->isValid()) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($place);
+            $em->flush();
+
+            return $place;
+        } else {
+            return $form;
+        }
     }
 }

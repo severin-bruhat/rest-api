@@ -6,8 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
+use AppBundle\Form\Type\UserType;
 use AppBundle\Entity\User;
 
 /**
@@ -50,5 +49,29 @@ class UserController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\Post("/users")
+     * @param Request $request
+     * @return User
+     */
+    public function postUsersAction(Request $request)
+    {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+
+        $form->submit($request->request->all());
+
+        if ($form->isValid()) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($user);
+            $em->flush();
+
+            return $user;
+        } else {
+            return $form;
+        }
     }
 }
