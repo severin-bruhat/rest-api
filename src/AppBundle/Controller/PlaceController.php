@@ -5,7 +5,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\ViewHandler;
+use FOS\RestBundle\View\View;
 use AppBundle\Entity\Place;
 
 /**
@@ -14,9 +16,10 @@ use AppBundle\Entity\Place;
 class PlaceController extends Controller
 {
     /**
-     * @Get("/places")
+     * @Rest\View()
+     * @Rest\Get("/places")
      * @param Request $request
-     * @return JsonResponse
+     * @return View
      */
     public function getPlacesAction(Request $request)
     {
@@ -25,20 +28,12 @@ class PlaceController extends Controller
                  ->findAll();
         /* @var $places Place[] */
 
-        $formatted = [];
-        foreach ($places as $place) {
-             $formatted[] = [
-                'id' => $place->getId(),
-                'name' => $place->getName(),
-                'address' => $place->getAddress(),
-             ];
-        }
-
-         return new JsonResponse($formatted);
+        return $places;
     }
 
     /**
-     * @Get("/places/{id}")
+     * @Rest\View()
+     * @Rest\Get("/places/{id}")
      * @param int     $id
      * @param Request $request
      * @return JsonResponse
@@ -54,12 +49,6 @@ class PlaceController extends Controller
             return new JsonResponse(['message' => 'Place not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $formatted = [
-           'id' => $place->getId(),
-           'name' => $place->getName(),
-           'address' => $place->getAddress(),
-        ];
-
-        return new JsonResponse($formatted);
+        return $place;
     }
 }

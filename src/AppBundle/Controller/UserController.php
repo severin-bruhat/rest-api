@@ -1,13 +1,13 @@
 <?php
 namespace AppBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\ViewHandler;
+use FOS\RestBundle\View\View;
 use AppBundle\Entity\User;
 
 /**
@@ -16,7 +16,8 @@ use AppBundle\Entity\User;
 class UserController extends Controller
 {
     /**
-     * @Get("/users")
+     * @Rest\View()
+     * @Rest\Get("/users")
      * @param Request $request
      * @return JsonResponse
      */
@@ -27,21 +28,12 @@ class UserController extends Controller
                 ->findAll();
         /* @var $users User[] */
 
-        $formatted = [];
-        foreach ($users as $user) {
-            $formatted[] = [
-               'id' => $user->getId(),
-               'firstname' => $user->getFirstname(),
-               'lastname' => $user->getLastname(),
-               'email' => $user->getEmail(),
-            ];
-        }
-
-        return new JsonResponse($formatted);
+        return $users;
     }
 
     /**
-     * @Get("/users/{id}")
+     * @Rest\View()
+     * @Rest\Get("/users/{id}")
      * @param int     $id
      * @param Request $request
      * @return JsonResponse
@@ -57,13 +49,6 @@ class UserController extends Controller
             return new JsonResponse(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $formatted = [
-           'id' => $user->getId(),
-           'firstname' => $user->getFirstname(),
-           'lastname' => $user->getLastname(),
-           'email' => $user->getEmail(),
-        ];
-
-        return new JsonResponse($formatted);
+        return $user;
     }
 }
