@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Request\ParamFetcher;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use AppBundle\Form\Type\PlaceType;
 use AppBundle\Entity\Place;
 
@@ -17,6 +18,11 @@ use AppBundle\Entity\Place;
 class PlaceController extends Controller
 {
     /**
+     *
+     * @ApiDoc(
+     *    description="Get a list of the places",
+     *    output= { "class"=Place::class, "collection"=true, "groups"={"place"} }
+     * )
      * @Rest\View(serializerGroups={"place"})
      * @Rest\Get("/places")
      * @QueryParam(name="offset", requirements="\d+", default="", description="begin paginator index")
