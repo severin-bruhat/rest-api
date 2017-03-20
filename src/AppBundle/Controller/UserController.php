@@ -60,11 +60,16 @@ class UserController extends Controller
     public function postUsersAction(Request $request)
     {
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+
+        $form = $this->createForm(UserType::class, $user, ['validation_groups' => ['Default', 'New']]);
 
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+            $encoder = $this->get('security.password_encoder');
+            $encoded = $encoder->encodePassword($user, $user->getPlainPassword());
+            $user->setPassword($encoded);
+
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($user);
             $em->flush();
@@ -131,14 +136,26 @@ class UserController extends Controller
              return $this->userNotFound();
         }
 
-        $form = $this->createForm(UserType::class, $user);
+        if ($clearMissing) { // validate the password in case of complete updtae
+            $options = ['validation_groups' => ['Default', 'FullUpdate']];
+        } else {
+            $options = []; // Le groupe de validation par défaut de Symfony est Default
+        }
+
+        $form = $this->createForm(UserType::class, $user, $options);
 
         $form->submit($request->request->all(), $clearMissing);
 
         if ($form->isValid()) {
-             $em = $this->get('doctrine.orm.entity_manager');
-             $em->persist($user);
-             $em->flush();
+            //if the user change his pwd
+            if (!empty($user->getPlainPassword())) {
+                  $encoder = $this->get('security.password_encoder');
+                  $encoded = $encoder->encodePassword($user, $user->getPlainPassword());
+                  $user->setPassword($encoded);
+            }
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($user);
+            $em->flush();
 
              return $user;
         } else {
