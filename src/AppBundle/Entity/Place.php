@@ -2,6 +2,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity()
@@ -27,6 +28,27 @@ class Place
      * @ORM\Column(type="string")
      */
     protected $address;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Price", mappedBy="place")
+     * @var Price[]
+     */
+    protected $prices;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Theme", mappedBy="place")
+     * @var Theme[]
+     */
+    protected $themes;
+
+    /**
+     * [__construct description]
+     */
+    public function __construct()
+    {
+        $this->prices = new ArrayCollection();
+        $this->themes = new ArrayCollection();
+    }
 
     /**
      * [getId description]
@@ -88,5 +110,41 @@ class Place
         $this->address = $address;
 
         return $this;
+    }
+
+    /**
+     * [setPrices description]
+     * @param [type] $prices [description]
+     */
+    public function setPrices($prices)
+    {
+        $this->prices = $prices;
+    }
+
+    /**
+     * [getPrices description]
+     * @return [type] [description]
+     */
+    public function getPrices()
+    {
+        return $this->prices;
+    }
+
+    /**
+     * [getThemes description]
+     * @return [type] [description]
+     */
+    public function getThemes()
+    {
+        return $this->themes;
+    }
+
+    /**
+     * [setThemes description]
+     * @param [type] $themes [description]
+     */
+    public function setThemes($themes)
+    {
+        $this->themes = $themes;
     }
 }

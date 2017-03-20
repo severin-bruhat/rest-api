@@ -9,3 +9,15 @@ places:
 users:
     type:     rest
     resource: AppBundle\Controller\UserController
+
+prices:
+    type:     rest
+    resource: AppBundle\Controller\Place\PriceController
+
+themes:
+    type:     rest
+    resource: AppBundle\Controller\Place\ThemeController
+
+preferences:
+    type:     rest
+    resource: AppBundle\Controller\User\PreferenceController

@@ -34,6 +34,20 @@ class User
     protected $email;
 
     /**
+     * @ORM\OneToMany(targetEntity="Preference", mappedBy="user")
+     * @var Preference[]
+     */
+    protected $preferences;
+
+    /**
+     * [__construct description]
+     */
+    public function __construct()
+    {
+        $this->preferences = new ArrayCollection();
+    }
+
+    /**
      * [getId description]
      * @return [type] [description]
      */
@@ -103,5 +117,23 @@ class User
     public function setEmail($email)
     {
         $this->email = $email;
+    }
+
+    /**
+     * [getPreferences description]
+     * @return [type] [description]
+     */
+    public function getPreferences()
+    {
+        return $this->preferences;
+    }
+
+    /**
+     * [setPreferences description]
+     * @param [type] $preferences [description]
+     */
+    public function setPreferences($preferences)
+    {
+        $this->preferences = $preferences;
     }
 }
