@@ -1,0 +1,37 @@
+<?php
+namespace AppBundle\Form\Validator\Constraint;
+
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
+/**
+ * Price consytraint validator
+ */
+class PriceTypeUniqueValidator extends ConstraintValidator
+{
+  /**
+   * [validate description]
+   * @param  [type]     $prices     [description]
+   * @param  Constraint $constraint [description]
+   * @return [type]                 [description]
+   */
+    public function validate($prices, Constraint $constraint)
+    {
+        if (!($prices instanceof \Doctrine\Common\Collections\ArrayCollection)) {
+            return;
+        }
+
+        $pricesType = [];
+
+        foreach ($prices as $price) {
+            if (in_array($price->getType(), $pricesType)) {
+                $this->context->buildViolation($constraint->message)
+                    ->addViolation();
+
+                return; //stop if there is a duplicate item
+            } else {
+                $pricesType[] = $price->getType();
+            }
+        }
+    }
+}
